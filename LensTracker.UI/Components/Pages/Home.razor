@@ -3,11 +3,11 @@
 
 <div class="calendar-wrapper">
 
+    <!-- Glowing ambient vertical light behind the wheel -->
+    <div class="glow-beam"></div>
+
     <!-- Vertical scroll calendar -->
     <div class="wheel-container" @on:scroll="OnScroll" @ref="WheelRef">
-
-        <!-- Glow on top of wheel -->
-        <div class="glow-beam"></div>
 
         @foreach (var day in Days)
         {
@@ -16,7 +16,7 @@
             </div>
         }
 
-        <!-- Invisible spacer to keep selected day always centerable -->
+        <!-- Spacer for bottom only -->
         <div style="height:180px"></div>
 
     </div>
@@ -35,30 +35,19 @@
     int SelectedDay = DateTime.Now.Day;
 
     const int ItemHeight = 60;
-    const int CenterOffset = 180; // Half of wheel height (360/2)
+
     async void OnScroll()
     {
         int scrollTop = await JS.InvokeAsync<int>("getScrollTop", WheelRef);
 
-        // Each item is 60px tall
+        // Compute selected day based on center alignment
         int index = (scrollTop + (420 / 2) - 30) / 60;
-        //       wheel height/2   item half height
 
         if (index >= 0 && index < Days.Count)
         {
             SelectedDay = Days[index];
             await InvokeAsync(StateHasChanged);
         }
-    }
-
-
-    async Task SnapToCenter()
-    {
-        int targetScroll = (SelectedDay - 1) * ItemHeight - CenterOffset + ItemHeight / 2;
-
-        if (targetScroll < 0) targetScroll = 0;
-
-        await JS.InvokeVoidAsync("smoothScrollTo", WheelRef, targetScroll);
     }
 
     async Task StartSession()
