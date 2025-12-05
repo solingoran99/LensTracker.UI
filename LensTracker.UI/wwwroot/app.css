@@ -1,0 +1,123 @@
+/* Background */
+body {
+    background: linear-gradient(135deg, #e8fffb, #e6f7f2);
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+}
+
+/* Main layout */
+.calendar-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    gap: 200px;
+    position: relative;
+}
+
+/* Glow behind the calendar */
+.glow-beam {
+    position: absolute;
+    left: calc(50% - 340px);
+    top: 50%;
+    transform: translateY(-50%);
+    width: 200px;
+    height: 700px;
+    background: rgba(0, 220, 190, 0.35);
+    filter: blur(60px);
+    border-radius: 200px;
+    z-index: 0;
+}
+
+/* SCROLL WHEEL */
+.wheel-container {
+    width: 120px;
+    height: 420px;
+    overflow-y: scroll;
+    scrollbar-width: none;
+    padding-right: 40px;
+    position: relative;
+    z-index: 2;
+}
+
+.wheel-container::-webkit-scrollbar {
+    display: none;
+}
+
+/* DAY NUMBERS */
+.wheel-item {
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 32px;
+    font-weight: 300;
+    color: #444;
+    transition: 0.2s ease;
+    cursor: pointer;
+}
+
+.wheel-item:hover {
+    transform: scale(1.15);
+    color: #00c3a7;
+}
+
+/* SELECTED DAY */
+.selected {
+    font-size: 46px;
+    font-weight: 800;
+    color: #00c3a7;
+    text-shadow: 
+        0 4px 12px rgba(0, 200, 175, 0.45),
+        0 0 18px rgba(0, 200, 175, 0.65);
+    animation: breathe 1.8s ease-in-out infinite;
+}
+
+/* Breathing animation */
+@keyframes breathe {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.07); }
+    100% { transform: scale(1); }
+}
+
+/* BEAUTIFUL CONTACT-LENS BUBBLE */
+.start-bubble {
+    width: 260px;
+    height: 260px;
+    border-radius: 50%;
+    background: rgba(0, 200, 175, 0.22);
+    backdrop-filter: blur(22px);
+    border: 2px solid rgba(0, 255, 235, 0.35);
+    box-shadow:
+        0 20px 45px rgba(0, 0, 0, 0.22),
+        inset 0 0 40px rgba(0, 200, 175, 0.35);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: float 4s ease-in-out infinite;
+}
+
+/* Floating animation */
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-12px); }
+    100% { transform: translateY(0px); }
+}
+
+/* START BUTTON */
+.start-button {
+    background: none;
+    border: none;
+    font-size: 34px;
+    font-weight: 600;
+    color: #00a894;
+    cursor: pointer;
+    transition: 0.3s ease;
+    text-shadow: 0 2px 12px rgba(0,200,175,0.45);
+}
+
+.start-button:hover {
+    transform: scale(1.12);
+    color: #00d3bb;
+    text-shadow: 0 3px 18px rgba(0,255,235,0.6);
+}

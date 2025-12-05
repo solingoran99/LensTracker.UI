@@ -1,0 +1,68 @@
+﻿@page "/"
+@inject IJSRuntime JS
+
+<div class="calendar-wrapper">
+
+    <!-- Vertical scroll calendar -->
+    <div class="wheel-container" @on:scroll="OnScroll" @ref="WheelRef">
+
+        <!-- Glow on top of wheel -->
+        <div class="glow-beam"></div>
+
+        @foreach (var day in Days)
+        {
+            <div class="wheel-item @(day == SelectedDay ? "selected" : "")">
+                @day
+            </div>
+        }
+
+        <!-- Invisible spacer to keep selected day always centerable -->
+        <div style="height:180px"></div>
+
+    </div>
+
+    <!-- Floating lens bubble -->
+    <div class="start-bubble">
+        <button class="start-button" @onclick="StartSession">Start</button>
+    </div>
+
+</div>
+
+@code {
+    ElementReference WheelRef;
+
+    List<int> Days = Enumerable.Range(1, 31).ToList();
+    int SelectedDay = DateTime.Now.Day;
+
+    const int ItemHeight = 60;
+    const int CenterOffset = 180; // Half of wheel height (360/2)
+    async void OnScroll()
+    {
+        int scrollTop = await JS.InvokeAsync<int>("getScrollTop", WheelRef);
+
+        // Each item is 60px tall
+        int index = (scrollTop + (420 / 2) - 30) / 60;
+        //       wheel height/2   item half height
+
+        if (index >= 0 && index < Days.Count)
+        {
+            SelectedDay = Days[index];
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+
+    async Task SnapToCenter()
+    {
+        int targetScroll = (SelectedDay - 1) * ItemHeight - CenterOffset + ItemHeight / 2;
+
+        if (targetScroll < 0) targetScroll = 0;
+
+        await JS.InvokeVoidAsync("smoothScrollTo", WheelRef, targetScroll);
+    }
+
+    async Task StartSession()
+    {
+        Console.WriteLine($"Starting session on day {SelectedDay}");
+    }
+}

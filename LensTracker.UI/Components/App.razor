@@ -1,0 +1,29 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
+    <link href="app.css" rel="stylesheet" />
+</head>
+
+<body>
+    <Routes />
+
+    <script src="_content/MudBlazor/MudBlazor.min.js"></script>
+    <script>
+        window.getScrollTop = (element) => element ? element.scrollTop : 0;
+
+        window.scrollToDay = (element, position) => {
+            if (element) {
+                element.scrollTop = position;
+            }
+        };
+    </script>
+
+
+
+
+</body>
+</html>
