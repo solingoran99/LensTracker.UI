@@ -15,16 +15,34 @@
     <Routes @rendermode="InteractiveServer" />
 
     <script>
-        window.getScrollTop = (element) => element ? element.scrollTop : 0;
+        window.getScrollTop = (element) => {
+            try {
+                if (!element || element.scrollTop == null) return 0;
+                return Number(element.scrollTop) || 0;
+            } catch {
+                return 0;
+            }
+        };
 
-        window.scrollToDay = (element, position) => {
-            if (element) {
-                element.scrollTop = position;
+        window.scrollToDay = (element, pos) => {
+            try {
+                if (element) element.scrollTop = pos;
+            } catch { }
+        };
+
+        window.getClientDate = () => {
+            try {
+                const now = new Date();
+                const sweden = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Stockholm" }));
+                return sweden.getDate();
+            } catch {
+                return new Date().getDate(); // fallback
             }
         };
     </script>
 
+
+
     <script src="_framework/blazor.web.js"></script>
 </body>
-
 </html>

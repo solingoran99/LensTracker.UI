@@ -29,7 +29,7 @@ body {
     z-index: 0;
 }
 
-/* SCROLL WHEEL */
+/* Wheel container */
 .wheel-container {
     width: 120px;
     height: 420px;
@@ -40,11 +40,11 @@ body {
     z-index: 2;
 }
 
-.wheel-container::-webkit-scrollbar {
-    display: none;
-}
+    .wheel-container::-webkit-scrollbar {
+        display: none;
+    }
 
-/* DAY NUMBERS */
+/* Day numbers */
 .wheel-item {
     height: 60px;
     display: flex;
@@ -57,30 +57,36 @@ body {
     cursor: pointer;
 }
 
-.wheel-item:hover {
+.wwheel-item:hover {
     transform: scale(1.15);
     color: #00c3a7;
 }
 
-/* SELECTED DAY */
+/* Highlighted day */
 .selected {
     font-size: 46px;
     font-weight: 800;
     color: #00c3a7;
-    text-shadow: 
-        0 4px 12px rgba(0, 200, 175, 0.45),
-        0 0 18px rgba(0, 200, 175, 0.65);
+    text-shadow: 0 4px 12px rgba(0, 200, 175, 0.45), 0 0 18px rgba(0, 200, 175, 0.65);
     animation: breathe 1.8s ease-in-out infinite;
 }
 
-/* Breathing animation */
+/* Breathing effect */
 @keyframes breathe {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.07); }
-    100% { transform: scale(1); }
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.07);
+    }
+
+    100% {
+        transform: scale(1);
+    }
 }
 
-/* BEAUTIFUL CONTACT-LENS BUBBLE */
+/* Start bubble */
 .start-bubble {
     width: 260px;
     height: 260px;
@@ -88,9 +94,7 @@ body {
     background: rgba(0, 200, 175, 0.22);
     backdrop-filter: blur(22px);
     border: 2px solid rgba(0, 255, 235, 0.35);
-    box-shadow:
-        0 20px 45px rgba(0, 0, 0, 0.22),
-        inset 0 0 40px rgba(0, 200, 175, 0.35);
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.22), inset 0 0 40px rgba(0, 200, 175, 0.35);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -99,12 +103,20 @@ body {
 
 /* Floating animation */
 @keyframes float {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-12px); }
-    100% { transform: translateY(0px); }
+    0% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-12px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
 }
 
-/* START BUTTON */
+/* Start button */
 .start-button {
     background: none;
     border: none;
@@ -116,12 +128,8 @@ body {
     text-shadow: 0 2px 12px rgba(0,200,175,0.45);
 }
 
-.start-button:hover {
-    transform: scale(1.12);
-    color: #00d3bb;
-    text-shadow: 0 3px 18px rgba(0,255,235,0.6);
-}
-.pad {
-    height: 180px;
-}
-
+    .start-button:hover {
+        transform: scale(1.12);
+        color: #00d3bb;
+        text-shadow: 0 3px 18px rgba(0,255,235,0.6);
+    }
