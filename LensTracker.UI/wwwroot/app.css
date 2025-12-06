@@ -13,6 +13,7 @@ body {
     height: 100vh;
     gap: 200px;
     position: relative;
+    cursor: pointer;
 }
 
 /* Glow behind the calendar */
@@ -38,6 +39,7 @@ body {
     padding-right: 40px;
     position: relative;
     z-index: 2;
+    cursor: default;
 }
 
     .wheel-container::-webkit-scrollbar {
@@ -54,15 +56,15 @@ body {
     font-weight: 300;
     color: #444;
     transition: 0.2s ease;
-    cursor: pointer;
 }
 
-.wwheel-item:hover {
-    transform: scale(1.15);
-    color: #00c3a7;
-}
+    /* Hover effect only */
+    .wheel-item:hover {
+        transform: scale(1.15);
+        color: #00c3a7;
+    }
 
-/* Highlighted day */
+/* Highlighted day (today) */
 .selected {
     font-size: 46px;
     font-weight: 800;
@@ -120,7 +122,7 @@ body {
 .start-button {
     background: none;
     border: none;
-    font-size: 34px;
+    font-size: 28px;
     font-weight: 600;
     color: #00a894;
     cursor: pointer;
@@ -133,3 +135,41 @@ body {
         color: #00d3bb;
         text-shadow: 0 3px 18px rgba(0,255,235,0.6);
     }
+
+/* --- NAVBAR --- */
+.top-nav {
+    width: 100%;
+    height: 70px;
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 40px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+/* Icons */
+.nav-icon {
+    height: 42px;
+    width: 42px;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+    .nav-icon:hover {
+        transform: scale(1.12);
+    }
+
+/* Date text */
+.nav-date {
+    font-size: 26px;
+    color: #008f7a;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+

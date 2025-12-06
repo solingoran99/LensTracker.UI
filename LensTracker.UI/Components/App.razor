@@ -8,6 +8,7 @@
 
     <link href="bootstrap/bootstrap.min.css" rel="stylesheet" />
     <link href="app.css" rel="stylesheet" />
+
     <HeadOutlet @rendermode="InteractiveServer" />
 </head>
 
@@ -19,16 +20,20 @@
             try {
                 if (!element || element.scrollTop == null) return 0;
                 return Number(element.scrollTop) || 0;
-            } catch {
-                return 0;
-            }
+            } catch { return 0; }
         };
 
         window.scrollToDay = (element, pos) => {
             try {
-                if (element) element.scrollTop = pos;
+                if (element) {
+                    element.scrollTo({
+                        top: pos,
+                        behavior: "smooth"
+                    });
+                }
             } catch { }
         };
+
 
         window.getClientDate = () => {
             try {
@@ -36,12 +41,28 @@
                 const sweden = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Stockholm" }));
                 return sweden.getDate();
             } catch {
-                return new Date().getDate(); // fallback
+                return new Date().getDate();
             }
         };
+
+        window.getFormattedDate = () => {
+            try {
+                const now = new Date();
+                const sweden = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Stockholm" }));
+
+                const day = sweden.getDate();
+                const month = sweden.toLocaleString("en-US", { month: "long" });
+
+                return `${day} ${month}`;
+            } catch {
+                const fallback = new Date();
+                const fday = fallback.getDate();
+                const fmonth = fallback.toLocaleString("en-US", { month: "long" });
+                return `${fday} ${fmonth}`;
+            }
+        };
+
     </script>
-
-
 
     <script src="_framework/blazor.web.js"></script>
 </body>

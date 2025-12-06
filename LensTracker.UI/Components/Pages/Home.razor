@@ -1,12 +1,12 @@
 ﻿@page "/"
 @inject IJSRuntime JS
 
-<div class="calendar-wrapper">
+<div class="calendar-wrapper" @onclick="ResetCalendarPosition">
 
     <div class="glow-beam"></div>
 
     <!-- Scroll wheel -->
-    <div class="wheel-container" @onscroll="OnScroll" @ref="WheelRef">
+    <div class="wheel-container" @onscroll="OnScroll" @ref="WheelRef" @onclick:stopPropagation="true">
 
         <!-- Top padding for centering -->
         <div style="height:180px"></div>
@@ -23,7 +23,7 @@
     </div>
 
     <div class="start-bubble">
-        <button class="start-button" @onclick="StartSession">Start</button>
+        <button class="start-button" @onclick="StartSession">Log Session</button>
     </div>
 
 </div>
@@ -32,17 +32,16 @@
     ElementReference WheelRef;
 
     List<int> Days = Enumerable.Range(1, 31).ToList();
-    int SelectedDay = 1; 
+    int SelectedDay = 1;
 
     const int ItemHeight = 60;
-    const int PadHeight = 180; // top + bottom pad
-    const int ContainerCenter = 210; // half of 420px
+    const int PadHeight = 180;
+    const int ContainerCenter = 210;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            // Get correct Sweden date
             try
             {
                 SelectedDay = await JS.InvokeAsync<int>("getClientDate");
@@ -52,43 +51,29 @@
                 SelectedDay = DateTime.Now.Day;
             }
 
-
-            int index = SelectedDay - 1;
-
-            
-            int scrollPosition =
-                PadHeight +
-                (index * ItemHeight) -
-                (ContainerCenter - (ItemHeight / 2));
-
-            await JS.InvokeVoidAsync("scrollToDay", WheelRef, scrollPosition);
-
+            await ResetCalendarPosition();
             StateHasChanged();
         }
     }
+
+    // 🔹 Scrolling should NOT change SelectedDay
     async void OnScroll()
     {
-        int scrollTop = 0;
-
-        try
-        {
-            scrollTop = await JS.InvokeAsync<int>("getScrollTop", WheelRef);
-        }
-        catch
-        {
-            scrollTop = 0; // fallback, never let the exception bubble
-        }
-
-        int index = (scrollTop - PadHeight + ContainerCenter - (ItemHeight / 2)) / ItemHeight;
-
-        if (index >= 0 && index < Days.Count)
-        {
-            SelectedDay = Days[index];
-            await InvokeAsync(StateHasChanged);
-        }
+        // Intentionally empty: no selection change on scroll.
     }
 
+    // 🔹 Clicking background resets calendar to today's date
+    async Task ResetCalendarPosition()
+    {
+        int index = SelectedDay - 1;
 
+        int scrollPosition =
+            PadHeight +
+            (index * ItemHeight) -
+            (ContainerCenter - (ItemHeight / 2));
+
+        await JS.InvokeVoidAsync("scrollToDay", WheelRef, scrollPosition);
+    }
 
     void StartSession()
     {
