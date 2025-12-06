@@ -1,5 +1,6 @@
 using LensTracker.UI.Components;
 using MudBlazor.Services;
+using LensTracker.UI.Services;
 
 namespace LensTracker.UI
 {
@@ -15,6 +16,7 @@ namespace LensTracker.UI
 
             
             builder.Services.AddMudServices();
+            builder.Services.AddScoped<DateService>();
 
             var app = builder.Build();
 

@@ -73,6 +73,25 @@ body {
     animation: breathe 1.8s ease-in-out infinite;
 }
 
+/* Today (real current date) */
+.today {
+    font-size: 46px;
+    font-weight: 800;
+    color: #00c3a7;
+    text-shadow: 0 4px 12px rgba(0, 200, 175, 0.45), 0 0 18px rgba(0, 200, 175, 0.65);
+    animation: breathe 1.8s ease-in-out infinite;
+}
+
+/* User-selected day (NOT today) */
+.active {
+    font-size: 40px;
+    font-weight: 700;
+    color: #007f75;
+    text-shadow: 0 2px 8px rgba(0, 150, 130, 0.25);
+    transform: scale(1.05);
+}
+
+
 /* Breathing effect */
 @keyframes breathe {
     0% {

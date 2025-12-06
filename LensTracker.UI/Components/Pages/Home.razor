@@ -1,24 +1,30 @@
 ﻿@page "/"
 @inject IJSRuntime JS
+@inject DateService DateService
 
-<div class="calendar-wrapper" @onclick="ResetCalendarPosition">
+<div class="calendar-wrapper" @onclick="ResetToToday">
 
     <div class="glow-beam"></div>
 
-    <!-- Scroll wheel -->
-    <div class="wheel-container" @onscroll="OnScroll" @ref="WheelRef" @onclick:stopPropagation="true">
+    <div class="wheel-container"
+         @onscroll="OnScroll"
+         @ref="WheelRef"
+         @onclick:stopPropagation="true">
 
-        <!-- Top padding for centering -->
         <div style="height:180px"></div>
 
         @foreach (var day in Days)
         {
-            <div class="wheel-item @(day == SelectedDay ? "selected" : "")">
+            string css =
+            day == Today ? "today" :
+            day == SelectedDay ? "active" : "";
+
+            <div class="wheel-item @css"
+                 @onclick="() => SelectDay(day)">
                 @day
             </div>
         }
 
-        <!-- Bottom padding -->
         <div style="height:180px"></div>
     </div>
 
@@ -32,6 +38,7 @@
     ElementReference WheelRef;
 
     List<int> Days = Enumerable.Range(1, 31).ToList();
+    int Today = 1;
     int SelectedDay = 1;
 
     const int ItemHeight = 60;
@@ -42,41 +49,55 @@
     {
         if (firstRender)
         {
-            try
-            {
-                SelectedDay = await JS.InvokeAsync<int>("getClientDate");
-            }
-            catch
-            {
-                SelectedDay = DateTime.Now.Day;
-            }
+            Today = await JS.InvokeAsync<int>("getClientDate");
+            SelectedDay = Today;
 
-            await ResetCalendarPosition();
-            StateHasChanged();
+            DateService.SetDay(SelectedDay);
+            await ScrollToDay(SelectedDay);
         }
     }
 
-    // 🔹 Scrolling should NOT change SelectedDay
-    async void OnScroll()
+    async Task ScrollToDay(int day)
     {
-        // Intentionally empty: no selection change on scroll.
-    }
-
-    // 🔹 Clicking background resets calendar to today's date
-    async Task ResetCalendarPosition()
-    {
-        int index = SelectedDay - 1;
-
-        int scrollPosition =
+        int index = day - 1;
+        int scrollPos =
             PadHeight +
             (index * ItemHeight) -
             (ContainerCenter - (ItemHeight / 2));
 
-        await JS.InvokeVoidAsync("scrollToDay", WheelRef, scrollPosition);
+        await JS.InvokeVoidAsync("scrollToDay", WheelRef, scrollPos);
+    }
+
+    void SelectDay(int day)
+    {
+        SelectedDay = day;
+        DateService.SetDay(day);
+    }
+
+    async void OnScroll()
+    {
+        double scrollTop = await JS.InvokeAsync<double>("getScrollTop", WheelRef);
+
+        int index = (int)((scrollTop - PadHeight + ContainerCenter - 30) / ItemHeight);
+
+        if (index >= 0 && index < Days.Count)
+        {
+            SelectedDay = Days[index];
+            DateService.SetDay(SelectedDay);
+            StateHasChanged();
+        }
+    }
+
+
+    async Task ResetToToday()
+    {
+        SelectedDay = Today;
+        DateService.SetDay(Today);
+        await ScrollToDay(Today);
     }
 
     void StartSession()
     {
-        Console.WriteLine($"Starting session on day {SelectedDay}");
+        Console.WriteLine($"Logged day {SelectedDay}");
     }
 }
