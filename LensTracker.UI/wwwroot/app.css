@@ -5,6 +5,13 @@ body {
     overflow-x: hidden;
 }
 
+/* --- UNIVERSAL FONT FOR ALL DAYS --- */
+.wheel-item,
+.today,
+.active {
+    font-family: 'Inter', sans-serif !important;
+}
+
 /* Main layout */
 .calendar-wrapper {
     display: flex;
@@ -50,6 +57,7 @@ body {
 .wheel-item {
     height: 60px;
     display: flex;
+    flex-direction: column; /* Needed for "today" label */
     justify-content: center;
     align-items: center;
     font-size: 32px;
@@ -58,37 +66,43 @@ body {
     transition: 0.2s ease;
 }
 
-    /* Hover effect only */
+    /* Hover effect */
     .wheel-item:hover {
         transform: scale(1.15);
         color: #00c3a7;
     }
 
-/* Highlighted day (today) */
-.selected {
-    font-size: 46px;
-    font-weight: 800;
-    color: #00c3a7;
-    text-shadow: 0 4px 12px rgba(0, 200, 175, 0.45), 0 0 18px rgba(0, 200, 175, 0.65);
-    animation: breathe 1.8s ease-in-out infinite;
-}
-
-/* Today (real current date) */
+/* Real Today */
 .today {
     font-size: 46px;
     font-weight: 800;
     color: #00c3a7;
     text-shadow: 0 4px 12px rgba(0, 200, 175, 0.45), 0 0 18px rgba(0, 200, 175, 0.65);
     animation: breathe 1.8s ease-in-out infinite;
+    position: relative;
 }
 
-/* User-selected day (NOT today) */
+/* User-selected date */
 .active {
     font-size: 40px;
     font-weight: 700;
     color: #007f75;
     text-shadow: 0 2px 8px rgba(0, 150, 130, 0.25);
     transform: scale(1.05);
+}
+
+/* Today label */
+/* Today label positioned top-left of today's number */
+.today-label {
+    position: absolute;
+    top: -0px;
+    left: 18px;
+    font-family: 'Playfair Display', serif;
+    font-size: 10px;
+    font-weight: 500;
+    color: #007f75;
+    opacity: 0.75;
+    pointer-events: none;
 }
 
 
@@ -184,12 +198,13 @@ body {
         transform: scale(1.12);
     }
 
-/* Date text */
+/* Navbar Date */
 .nav-date {
     font-family: 'Playfair Display', serif;
     font-size: 20px;
     font-weight: 500;
-    color: #1a1a1a; 
+    color: #1a1a1a;
     letter-spacing: 0.5px;
-    text-transform: capitalize; 
-    text-shadow: 0px 1px 2px rgba(0,0,0,0.08); 
+    text-transform: capitalize;
+    text-shadow: 0px 1px 2px rgba(0,0,0,0.08);
+}
