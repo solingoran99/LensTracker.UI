@@ -22,45 +22,34 @@
             try {
                 if (!element || element.scrollTop == null) return 0;
                 return Number(element.scrollTop) || 0;
-            } catch { return 0; }
+            } catch {
+                return 0;
+            }
+        };
+
+        window.setScrollTop = (element, pos) => {
+            try {
+                if (element) {
+                    element.scrollTop = pos;
+                }
+            } catch { }
         };
 
         window.scrollToDay = (element, pos) => {
             try {
                 if (element) {
-                    element.scrollTo({
-                        top: pos,
-                        behavior: "smooth"
-                    });
+                    element.scrollTo({ top: pos, behavior: "smooth" });
                 }
             } catch { }
         };
 
-
-        window.getClientDate = () => {
+        window.getClientDateString = () => {
             try {
                 const now = new Date();
                 const sweden = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Stockholm" }));
-                return sweden.getDate();
+                return sweden.toISOString();
             } catch {
-                return new Date().getDate();
-            }
-        };
-
-        window.getFormattedDate = () => {
-            try {
-                const now = new Date();
-                const sweden = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Stockholm" }));
-
-                const day = sweden.getDate();
-                const month = sweden.toLocaleString("en-US", { month: "long" });
-
-                return `${day} ${month}`;
-            } catch {
-                const fallback = new Date();
-                const fday = fallback.getDate();
-                const fmonth = fallback.toLocaleString("en-US", { month: "long" });
-                return `${fday} ${fmonth}`;
+                return new Date().toISOString();
             }
         };
 

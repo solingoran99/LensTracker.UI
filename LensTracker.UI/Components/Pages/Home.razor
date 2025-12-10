@@ -3,104 +3,175 @@
 @inject DateService DateService
 
 <div class="calendar-wrapper" @onclick="ResetToToday">
-
     <div class="glow-beam"></div>
-
-    <div class="wheel-container"
-         @onscroll="OnScroll"
-         @ref="WheelRef"
-         @onclick:stopPropagation="true">
-
+    <div class="wheel-container" @onscroll="OnScroll" @ref="WheelRef" @onclick:stopPropagation="true">
         <div style="height:180px"></div>
-
         @foreach (var day in Days)
         {
-            string css =
-            day == Today ? "today" :
-            day == SelectedDay ? "active" : "";
-
+            string css = IsSameDate(day, TodayDate) ? "today" : IsSameDate(day, SelectedDate) ? "active" : "";
             <div class="wheel-item @css" @onclick="() => SelectDay(day)">
-                @day
-
-                @if (day == Today)
+                @day.Day
+                @if (IsSameDate(day, TodayDate))
                 {
                     <div class="today-label">today</div>
                 }
-
             </div>
         }
-
         <div style="height:180px"></div>
     </div>
-
     <div class="start-bubble">
         <button class="start-button" @onclick="StartSession">Log Session</button>
     </div>
-
 </div>
 
 @code {
     ElementReference WheelRef;
-
-    List<int> Days = Enumerable.Range(1, 31).ToList();
-    int Today = 1;
-    int SelectedDay = 1;
-
+    List<DateTime> Days = new();
+    DateTime TodayDate;
+    DateTime SelectedDate;
     const int ItemHeight = 60;
     const int PadHeight = 180;
     const int ContainerCenter = 210;
+    bool isScrolling = false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            Today = await JS.InvokeAsync<int>("getClientDate");
-            SelectedDay = Today;
+            TodayDate = await GetClientDate();
+            SelectedDate = TodayDate;
 
-            DateService.SetDay(SelectedDay);
-            await ScrollToDay(SelectedDay);
+            // Initialize with 3 months of days centered on today
+            GenerateDays(TodayDate.AddMonths(-1), TodayDate.AddMonths(2));
+
+            DateService.SetDate(SelectedDate);
+            StateHasChanged();
+
+            await Task.Delay(50); 
+            await ScrollToDate(SelectedDate);
         }
     }
 
-    async Task ScrollToDay(int day)
+    void GenerateDays(DateTime start, DateTime end)
     {
-        int index = day - 1;
-        int scrollPos =
-            PadHeight +
-            (index * ItemHeight) -
-            (ContainerCenter - (ItemHeight / 2));
+        Days.Clear();
+        DateTime current = new DateTime(start.Year, start.Month, 1);
 
-        await JS.InvokeVoidAsync("scrollToDay", WheelRef, scrollPos);
+        while (current <= end)
+        {
+            int daysInMonth = DateTime.DaysInMonth(current.Year, current.Month);
+            for (int day = 1; day <= daysInMonth; day++)
+            {
+                Days.Add(new DateTime(current.Year, current.Month, day));
+            }
+            current = current.AddMonths(1);
+        }
     }
 
-    void SelectDay(int day)
+    async Task<DateTime> GetClientDate()
     {
-        SelectedDay = day;
-        DateService.SetDay(day);
+        try
+        {
+            var dateString = await JS.InvokeAsync<string>("getClientDateString");
+            return DateTime.Parse(dateString);
+        }
+        catch
+        {
+            return DateTime.Now;
+        }
+    }
+
+    async Task ScrollToDate(DateTime date)
+    {
+        int index = Days.FindIndex(d => IsSameDate(d, date));
+        if (index >= 0)
+        {
+            int scrollPos = PadHeight + (index * ItemHeight) - (ContainerCenter - (ItemHeight / 2));
+            await JS.InvokeVoidAsync("scrollToDay", WheelRef, scrollPos);
+        }
+    }
+
+    void SelectDay(DateTime day)
+    {
+        SelectedDate = day;
+        DateService.SetDate(day);
+    }
+
+    bool IsSameDate(DateTime d1, DateTime d2)
+    {
+        return d1.Year == d2.Year && d1.Month == d2.Month && d1.Day == d2.Day;
     }
 
     async void OnScroll()
     {
-        double scrollTop = await JS.InvokeAsync<double>("getScrollTop", WheelRef);
-        int index = (int)((scrollTop - PadHeight + ContainerCenter - 30) / ItemHeight);
+        if (isScrolling) return;
 
-        if (index >= 0 && index < Days.Count)
+        isScrolling = true;
+
+        try
         {
-            SelectedDay = Days[index];
-            DateService.SetDay(SelectedDay);
-            StateHasChanged();
+            double scrollTop = await JS.InvokeAsync<double>("getScrollTop", WheelRef);
+            int maxScroll = (Days.Count * ItemHeight);
+
+          
+            if (scrollTop < 1000) 
+            {
+                var firstDay = Days[0];
+                var newStart = firstDay.AddMonths(-1);
+                var oldFirstDay = Days[0];
+
+                GenerateDays(newStart, Days[Days.Count - 1]);
+                StateHasChanged();
+
+                await Task.Delay(10);
+
+                
+                int oldIndex = Days.FindIndex(d => IsSameDate(d, oldFirstDay));
+                int adjustment = oldIndex * ItemHeight;
+                await JS.InvokeVoidAsync("setScrollTop", WheelRef, scrollTop + adjustment);
+                scrollTop = scrollTop + adjustment;
+            }
+            else if (scrollTop > maxScroll - 1000) 
+            {
+                var lastDay = Days[Days.Count - 1];
+                var newEnd = lastDay.AddMonths(2);
+
+                GenerateDays(Days[0], newEnd);
+                StateHasChanged();
+            }
+
+            // Update selected day based on center position
+            int index = (int)((scrollTop - PadHeight + ContainerCenter - 30) / ItemHeight);
+            if (index >= 0 && index < Days.Count)
+            {
+                SelectedDate = Days[index];
+                DateService.SetDate(SelectedDate);
+                StateHasChanged();
+            }
+        }
+        finally
+        {
+            isScrolling = false;
         }
     }
 
     async Task ResetToToday()
     {
-        SelectedDay = Today;
-        DateService.SetDay(Today);
-        await ScrollToDay(Today);
+        SelectedDate = TodayDate;
+        DateService.SetDate(TodayDate);
+
+        if (!Days.Any(d => IsSameDate(d, TodayDate)))
+        {
+            GenerateDays(TodayDate.AddMonths(-1), TodayDate.AddMonths(2));
+            StateHasChanged();
+            await Task.Delay(50);
+        }
+
+        await ScrollToDate(TodayDate);
     }
 
     void StartSession()
     {
-        Console.WriteLine($"Logged day {SelectedDay}");
+        Console.WriteLine($"Logged: {SelectedDate:yyyy-MM-dd}");
     }
-}
+}}

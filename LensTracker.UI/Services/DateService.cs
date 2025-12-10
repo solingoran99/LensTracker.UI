@@ -2,15 +2,14 @@
 {
     public class DateService
     {
-        public int SelectedDay { get; private set; }
+        public DateTime SelectedDate { get; private set; }
         public string FormattedDate { get; private set; } = "";
         public event Action? OnChange;
 
-        public void SetDay(int day)
+        public void SetDate(DateTime date)
         {
-            SelectedDay = day;
-            string month = DateTime.Now.ToString("MMMM");
-            FormattedDate = $"{day} {month}";
+            SelectedDate = date;
+            FormattedDate = date.ToString("d MMMM yyyy");
             OnChange?.Invoke();
         }
     }
